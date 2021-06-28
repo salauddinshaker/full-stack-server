@@ -4,10 +4,10 @@ const cors = require('cors')
 const bodyParser = require('body-parser');
 require('dotenv').config()
 const { MongoClient } = require('mongodb');
-const port = process.env.PORT || 4200
+
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8p3b1.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 console.log(process.env.DB_USER);
@@ -23,12 +23,15 @@ client.connect(err => {
 
   app.post('/addProduct', (req, res) => {
     const newProduct = req.body;
-    ponnoCollection.insertOne(newProduct);
-    console.log('new product added ....', ponnoCollection)
+    ponnoCollection.insertOne(newProduct)
+    .then(result=>{
+      res.send( result)
+      console.log(newProduct);
+    })
+   
   })
 });
 
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+
+app.listen(process.env.PORT || 4000);
