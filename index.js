@@ -18,7 +18,7 @@ client.connect(err => {
   // perform actions on the collection object
   console.log('database connected')
   app.get('/', (req, res) => {
-    res.send('OIYeeeeh..........')
+    res.send('Get method is activated...')
   })
 
   app.post('/addProduct', (req, res) => {
