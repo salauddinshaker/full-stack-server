@@ -1,9 +1,11 @@
 const express = require('express')
 const app = express()
+const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectID;
 const cors = require('cors')
 const bodyParser = require('body-parser');
 require('dotenv').config()
-const { MongoClient } = require('mongodb');
+
 
 
 app.use(cors());
@@ -15,10 +17,25 @@ console.log(process.env.DB_USER);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const ponnoCollection = client.db("dailybazarcollection").collection("ponnoavailable");
+  const orderCollection = client.db("dailybazarcollection").collection("orders");
   // perform actions on the collection object
   console.log('database connected')
   app.get('/', (req, res) => {
     res.send('Get method is activated...')
+  })
+
+  app.get('/productCollection',(req, res)=>{
+    ponnoCollection.find()
+    .toArray((err, ponno)=>{
+      res.send(ponno);
+    })
+  })
+
+  app.get('/ordersCollection',(req, res)=>{
+    orderCollection.find()
+    .toArray((err, ponno)=>{
+      res.send(ponno);
+    })
   })
 
   app.post('/addProduct', (req, res) => {
@@ -28,8 +45,26 @@ client.connect(err => {
       res.send( result)
       console.log(newProduct);
     })
-   
   })
+
+
+
+  app.delete('/deleteProduct', (req, res)=>{
+    const id = ObjectId(req.params.id);
+    console.log('delete this',id)
+    ponnoCollection.deleteOne({_id:id})
+    .then(documents => res.send(documents));
+  })
+
+  app.post('/addOrder', (req, res) => {
+    const orderAdded = req.body;
+    orderCollection.insertOne(orderAdded)
+    .then(result=>{
+      res.send( result)
+      console.log(orderAdded);
+    })
+  })
+
 });
 
 
